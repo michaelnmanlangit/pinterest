@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Image.asset(
-                        'assets/images/pinterest-emblem.png',
+                        'assets/images/Pinterest-Emblem.png',
                         width: 80,
                         height: 80,
                         fit: BoxFit.cover,
