@@ -97,13 +97,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.all(Radius.circular(16)),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Image.asset(
                         'assets/images/pinterest-emblem.png',
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
