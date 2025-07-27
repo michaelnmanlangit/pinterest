@@ -9,6 +9,8 @@ import 'account_settings_screen.dart';
 import 'notification_settings_screen.dart';
 import 'privacy_settings_screen.dart';
 import 'help_support_screen.dart';
+import 'login_screen.dart';
+import 'create_post_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -39,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: Consumer2<PinterestProvider, AuthService>(
         builder: (context, provider, authService, child) {
           final savedPins = provider.getSavedPins();
+          final createdPins = provider.getCreatedPins();
           final currentUser = authService.currentUser;
           
           return CustomScrollView(
@@ -56,9 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           const SizedBox(width: 40),
                           GestureDetector(
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Change profile picture')),
-                              );
+                              _showChangeProfilePictureDialog(context);
                             },
                             child: CircleAvatar(
                               radius: 50,
@@ -80,9 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       // Profile Name and Stats
                       GestureDetector(
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Edit name')),
-                          );
+                          _showEditProfileDialog(context, authService);
                         },
                         child: Text(
                           currentUser?.name ?? 'Your Profile',
@@ -95,9 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       const SizedBox(height: 8),
                       GestureDetector(
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Edit username')),
-                          );
+                          _showEditProfileDialog(context, authService);
                         },
                         child: Text(
                           currentUser?.username ?? '@yourhandle',
@@ -111,9 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Edit bio')),
-                            );
+                            _showEditProfileDialog(context, authService);
                           },
                           child: Text(
                             currentUser.bio,
@@ -132,19 +127,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _buildStatColumn('Following', currentUser?.following.toString() ?? '234', () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('View following')),
-                            );
+                            _showFollowingList(context);
                           }),
                           _buildStatColumn('Followers', _formatNumber(currentUser?.followers ?? 1200), () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('View followers')),
-                            );
+                            _showFollowersList(context);
                           }),
                           _buildStatColumn('Pins', savedPins.length.toString(), () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('View all pins')),
-                            );
+                            _showAllPinsView(context);
                           }),
                         ],
                       ),
@@ -230,37 +219,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                     // Saved Pins Tab
                     _buildPinsGrid(savedPins),
                     
-                    // Created Pins Tab (empty for demo)
-                    const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_circle_outline,
-                            size: 64,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Nothing to show...yet!',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Pins you create will live here',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          SizedBox(height: 24),
-                          // Create Button would go here
-                        ],
-                      ),
-                    ),
+                    // Created Pins Tab - Show user created pins
+                    _buildPinsGrid(createdPins, isCreateTab: true),
                   ],
                 ),
               ),
@@ -305,33 +265,54 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget _buildPinsGrid(List pins) {
+  Widget _buildPinsGrid(List pins, {bool isCreateTab = false}) {
     if (pins.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.bookmark_outline,
+              isCreateTab ? Icons.add_circle_outline : Icons.bookmark_outline,
               size: 64,
               color: Colors.grey,
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Nothing to show...yet!',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Pins you save will live here',
-              style: TextStyle(
+              isCreateTab ? 'Pins you create will live here' : 'Pins you save will live here',
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
               ),
             ),
+            if (isCreateTab) ...[
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CreatePostScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text('Create Pin'),
+              ),
+            ],
           ],
         ),
       );
@@ -449,9 +430,25 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 );
                 if (confirmed == true) {
-                  await authService.logout();
-                  if (context.mounted) {
-                    Navigator.pushReplacementNamed(context, '/login');
+                  try {
+                    await authService.logout();
+                    if (context.mounted) {
+                      // Navigate to login by replacing the entire app
+                      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ),
+                        (route) => false,
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Logout failed: $e')),
+                      );
+                    }
                   }
                 }
               },
@@ -590,13 +587,294 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Show QR code'),
               onTap: () {
                 Navigator.pop(context);
+                _showQRCodeDialog(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showChangeProfilePictureDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Change Profile Picture',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take Photo'),
+              onTap: () {
+                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Showing QR code...')),
+                  const SnackBar(content: Text('Opening camera...')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Opening gallery...')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.link),
+              title: const Text('Use Photo URL'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPhotoUrlDialog(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Remove Photo', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Profile picture removed')),
                 );
               },
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showPhotoUrlDialog(BuildContext context) {
+    final urlController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Profile Picture URL'),
+        content: TextField(
+          controller: urlController,
+          decoration: const InputDecoration(
+            labelText: 'Enter image URL',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (urlController.text.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Profile picture updated')),
+                );
+              }
+            },
+            child: const Text('Update'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFollowingList(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Following'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: ListView.builder(
+            itemCount: 5, // Sample data
+            itemBuilder: (context, index) {
+              final users = [
+                {'name': 'Sarah Johnson', 'username': '@sarah_j', 'avatar': 'https://images.unsplash.com/photo-1494790108755-2616b612b48b?w=100&h=100&fit=crop&crop=face'},
+                {'name': 'Michael Chen', 'username': '@mike_chen', 'avatar': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'},
+                {'name': 'Emma Wilson', 'username': '@emma_w', 'avatar': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'},
+                {'name': 'Alex Thompson', 'username': '@alex_t', 'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'},
+                {'name': 'Lisa Garcia', 'username': '@lisa_g', 'avatar': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face'},
+              ];
+              
+              final user = users[index];
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(user['avatar'] as String),
+                ),
+                title: Text(user['name'] as String),
+                subtitle: Text(user['username'] as String),
+                trailing: OutlinedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Unfollowed ${user['name']}')),
+                    );
+                  },
+                  child: const Text('Following'),
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFollowersList(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Followers'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: ListView.builder(
+            itemCount: 8, // Sample data
+            itemBuilder: (context, index) {
+              final followers = [
+                {'name': 'John Smith', 'username': '@john_s', 'avatar': 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=100&h=100&fit=crop&crop=face', 'following': false},
+                {'name': 'Maria Rodriguez', 'username': '@maria_r', 'avatar': 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=100&h=100&fit=crop&crop=face', 'following': true},
+                {'name': 'David Kim', 'username': '@david_k', 'avatar': 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face', 'following': false},
+                {'name': 'Sophie Brown', 'username': '@sophie_b', 'avatar': 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face', 'following': true},
+                {'name': 'James Wilson', 'username': '@james_w', 'avatar': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face', 'following': false},
+                {'name': 'Anna Lee', 'username': '@anna_l', 'avatar': 'https://images.unsplash.com/photo-1440133197387-5a6020d5ace2?w=100&h=100&fit=crop&crop=face', 'following': true},
+                {'name': 'Ryan Taylor', 'username': '@ryan_t', 'avatar': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face', 'following': false},
+                {'name': 'Jessica Miller', 'username': '@jessica_m', 'avatar': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face', 'following': true},
+              ];
+              
+              final follower = followers[index];
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(follower['avatar'] as String),
+                ),
+                title: Text(follower['name'] as String),
+                subtitle: Text(follower['username'] as String),
+                trailing: follower['following'] as bool
+                    ? OutlinedButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Unfollowed ${follower['name']}')),
+                          );
+                        },
+                        child: const Text('Following'),
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Following ${follower['name']}')),
+                          );
+                        },
+                        child: const Text('Follow'),
+                      ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAllPinsView(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: const Text('All Pins'),
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 0,
+          ),
+          body: Consumer<PinterestProvider>(
+            builder: (context, provider, child) {
+              final savedPins = provider.getSavedPins();
+              return _buildPinsGrid(savedPins);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showQRCodeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('QR Code'),
+        content: SizedBox(
+          width: 200,
+          height: 200,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.qr_code, size: 80, color: Colors.grey),
+                  SizedBox(height: 8),
+                  Text('QR Code'),
+                  Text('Feature coming soon!', 
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('QR code saved to gallery')),
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }

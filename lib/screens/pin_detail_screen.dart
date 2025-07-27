@@ -36,10 +36,7 @@ class PinDetailScreen extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.share, color: Colors.black),
                     onPressed: () {
-                      // Share functionality
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Share feature would be implemented here')),
-                      );
+                      _showShareOptions(context);
                     },
                   ),
                   IconButton(
@@ -99,17 +96,17 @@ class PinDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () => provider.toggleSavePin(pin.id),
+                          onPressed: pin.authorName == 'You' ? null : () => provider.toggleSavePin(pin.id),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isSaved ? Colors.black : Colors.red,
-                            foregroundColor: Colors.white,
+                            backgroundColor: pin.authorName == 'You' ? Colors.grey[300] : (isSaved ? Colors.black : Colors.red),
+                            foregroundColor: pin.authorName == 'You' ? Colors.grey[600] : Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
                           child: Text(
-                            isSaved ? 'Saved' : 'Save',
+                            pin.authorName == 'You' ? 'Your Pin' : (isSaved ? 'Saved' : 'Save'),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -189,21 +186,31 @@ class PinDetailScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Follow feature would be implemented here')),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
-                              foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                          // Only show follow button if it's not your own pin
+                          if (pin.authorName != 'You')
+                            Consumer<PinterestProvider>(
+                              builder: (context, provider, child) {
+                                final isFollowing = provider.isUserFollowed(pin.authorName);
+                                return ElevatedButton(
+                                  onPressed: () {
+                                    provider.toggleFollowUser(pin.authorName);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(isFollowing ? 'Unfollowed ${pin.authorName}' : 'Following ${pin.authorName}'),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isFollowing ? Colors.grey[300] : Colors.red,
+                                    foregroundColor: isFollowing ? Colors.black : Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Text(isFollowing ? 'Following' : 'Follow'),
+                                );
+                              },
                             ),
-                            child: const Text('Follow'),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -506,6 +513,86 @@ class PinDetailScreen extends StatelessWidget {
       const SnackBar(
         content: Text('Pin link copied to clipboard'),
         duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showShareOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Share Pin',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.copy),
+              title: const Text('Copy pin link'),
+              onTap: () {
+                Navigator.pop(context);
+                _copyPinLink(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.message),
+              title: const Text('Send via message'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Opening messages...')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.email),
+              title: const Text('Send via email'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Opening email...')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: const Text('More sharing options'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Opening system share sheet...')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.download, color: Colors.green),
+              title: const Text('Download image', style: TextStyle(color: Colors.green)),
+              onTap: () {
+                Navigator.pop(context);
+                _downloadImage(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

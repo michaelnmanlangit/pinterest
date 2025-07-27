@@ -85,6 +85,8 @@ class PinterestProvider extends ChangeNotifier {
   bool isPinLiked(String pinId) => _dataService.isPinLiked(pinId);
 
   List<Pin> getSavedPins() => _dataService.getSavedPins();
+  
+  List<Pin> getCreatedPins() => _dataService.getCreatedPins();
   List<String> getCategories() => _dataService.getCategories();
   
   Pin? getPinById(String id) => _dataService.getPinById(id);
@@ -112,4 +114,53 @@ class PinterestProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void toggleFollowUser(String userId) {
+    _dataService.toggleFollowUser(userId);
+    notifyListeners();
+  }
+
+  bool isUserFollowed(String userId) => _dataService.isUserFollowed(userId);
+  List<String> getFollowedUsers() => _dataService.getFollowedUsers();
+
+  // Create Post functionality
+  Future<Pin> createPost({
+    required String title,
+    required String description,
+    required String imageUrl,
+    required List<String> tags,
+    required String category,
+    String? boardId,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    
+    try {
+      final newPin = await _dataService.createPost(
+        title: title,
+        description: description,
+        imageUrl: imageUrl,
+        tags: tags,
+        category: category,
+        boardId: boardId,
+      );
+      
+      // Refresh pins to include the new post
+      _pins = _dataService.getAllPins();
+      _isLoading = false;
+      notifyListeners();
+      
+      return newPin;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // Get sample images for post creation
+  List<String> getSampleImageUrls() => _dataService.getSampleImageUrls();
+  
+  // Get categories for post creation
+  List<String> getPostCategories() => _dataService.getPostCategories();
 }

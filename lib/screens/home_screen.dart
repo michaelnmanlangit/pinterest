@@ -8,6 +8,7 @@ import 'search_screen.dart';
 import 'profile_screen.dart';
 import 'notification_screen.dart';
 import 'message_screen.dart';
+import 'create_post_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -147,6 +148,17 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
                       ),
                       Row(
                         children: [
+                          IconButton(
+                            icon: const Icon(Icons.add_circle_outline),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CreatePostScreen(),
+                                ),
+                              );
+                            },
+                          ),
                           IconButton(
                             icon: const Icon(Icons.notifications_outlined),
                             onPressed: () {
