@@ -1,0 +1,57 @@
+[
+  {
+    "id": "1",
+    "name": "Home Decor",
+    "description": "Beautiful home decoration ideas and inspiration",
+    "coverImage": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    "pinCount": 45,
+    "followers": 2341,
+    "isSecret": false,
+    "createdBy": "1",
+    "pins": ["1", "2", "3", "6", "10"]
+  },
+  {
+    "id": "2",
+    "name": "Recipe Collection",
+    "description": "Delicious recipes from around the world",
+    "coverImage": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+    "pinCount": 23,
+    "followers": 1876,
+    "isSecret": false,
+    "createdBy": "1",
+    "pins": ["4"]
+  },
+  {
+    "id": "3",
+    "name": "Fashion Inspiration",
+    "description": "Latest fashion trends and outfit ideas",
+    "coverImage": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=300&fit=crop",
+    "pinCount": 67,
+    "followers": 3456,
+    "isSecret": false,
+    "createdBy": "2",
+    "pins": ["5"]
+  },
+  {
+    "id": "4",
+    "name": "Travel Dreams",
+    "description": "Beautiful destinations around the world",
+    "coverImage": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    "pinCount": 89,
+    "followers": 5678,
+    "isSecret": false,
+    "createdBy": "3",
+    "pins": ["9"]
+  },
+  {
+    "id": "5",
+    "name": "Art Gallery",
+    "description": "Contemporary and abstract art pieces",
+    "coverImage": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
+    "pinCount": 34,
+    "followers": 1234,
+    "isSecret": false,
+    "createdBy": "3",
+    "pins": ["7"]
+  }
+]
