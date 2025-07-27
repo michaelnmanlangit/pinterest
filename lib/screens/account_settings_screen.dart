@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
-  const AccountSettingsScreen({Key? key}) : super(key: key);
+  const AccountSettingsScreen({super.key});
 
   @override
   State<AccountSettingsScreen> createState() => _AccountSettingsScreenState();

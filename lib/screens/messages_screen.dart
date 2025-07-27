@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MessagesScreen extends StatefulWidget {
-  const MessagesScreen({Key? key}) : super(key: key);
+  const MessagesScreen({super.key});
 
   @override
   State<MessagesScreen> createState() => _MessagesScreenState();
@@ -111,7 +111,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           
           // Online Friends Section
           Container(
-            height: 100,
+            height: 94,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +123,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Expanded(
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -378,7 +378,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 class ChatScreen extends StatefulWidget {
   final Conversation conversation;
 
-  const ChatScreen({Key? key, required this.conversation}) : super(key: key);
+  const ChatScreen({super.key, required this.conversation});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();

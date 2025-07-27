@@ -94,13 +94,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 80,
                     height: 80,
                     decoration: const BoxDecoration(
-                      color: Colors.red,
+                      color: Colors.white,
                       borderRadius: BorderRadius.all(Radius.circular(16)),
                     ),
-                    child: const Icon(
-                      Icons.push_pin,
-                      size: 40,
-                      color: Colors.white,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.asset(
+                        'assets/images/pinterest-emblem.png',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -405,53 +409,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 
                 const SizedBox(height: 32),
                 
-                // Divider
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: Colors.grey[300])),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'OR',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.grey[300])),
-                  ],
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Social Login Buttons
-                _buildSocialButton(
-                  'Continue with Google',
-                  Icons.g_mobiledata,
-                  Colors.red,
-                  () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Google signup coming soon!')),
-                    );
-                  },
-                ),
-                
-                const SizedBox(height: 12),
-                
-                _buildSocialButton(
-                  'Continue with Facebook',
-                  Icons.facebook,
-                  Colors.blue,
-                  () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Facebook signup coming soon!')),
-                    );
-                  },
-                ),
-                
-                const SizedBox(height: 32),
-                
                 // Sign In Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -483,30 +440,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 24),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialButton(String text, IconData icon, Color color, VoidCallback onPressed) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, color: color),
-        label: Text(
-          text,
-          style: TextStyle(
-            color: Colors.grey[700],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          side: BorderSide(color: Colors.grey[300]!),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),

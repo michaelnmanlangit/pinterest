@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MessageScreen extends StatefulWidget {
-  const MessageScreen({Key? key}) : super(key: key);
+  const MessageScreen({super.key});
 
   @override
   State<MessageScreen> createState() => _MessageScreenState();
@@ -425,7 +425,7 @@ class _MessageScreenState extends State<MessageScreen> {
 class ChatScreen extends StatefulWidget {
   final Conversation conversation;
 
-  const ChatScreen({Key? key, required this.conversation}) : super(key: key);
+  const ChatScreen({super.key, required this.conversation});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();

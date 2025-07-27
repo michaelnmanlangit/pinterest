@@ -6,9 +6,8 @@ import '../widgets/pin_card.dart';
 import '../utils/responsive_helper.dart';
 import 'search_screen.dart';
 import 'profile_screen.dart';
-import 'notification_screen.dart';
-import 'message_screen.dart';
 import 'create_post_screen.dart';
+import 'messages_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -41,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           PinterestHomeTab(),
           SearchScreen(),
+          CreatePostScreen(),
+          MessagesScreen(),
           ProfileScreen(),
         ],
       ),
@@ -71,6 +72,16 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.search_outlined),
             activeIcon: Icon(Icons.search),
             label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_outline),
+            activeIcon: Icon(Icons.add_circle),
+            label: 'Create',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            activeIcon: Icon(Icons.chat_bubble),
+            label: 'Messages',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
@@ -145,43 +156,6 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.add_circle_outline),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CreatePostScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.notifications_outlined),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const NotificationScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.chat_bubble_outline),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MessageScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
                       ),
                     ],
                   ),

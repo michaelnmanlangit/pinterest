@@ -102,7 +102,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 ],
                 
                 // Image Selection Grid
-                Container(
+                SizedBox(
                   height: 200,
                   child: GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
