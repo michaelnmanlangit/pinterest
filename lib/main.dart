@@ -77,10 +77,11 @@ class _SplashScreenState extends State<SplashScreen> {
     final pinterestProvider = Provider.of<PinterestProvider>(context, listen: false);
     final authService = Provider.of<AuthService>(context, listen: false);
     
-    // Initialize both services
+    // Initialize both services and wait for 3 seconds minimum
     await Future.wait([
       pinterestProvider.initialize(),
       authService.initialize(),
+      Future.delayed(const Duration(seconds: 3)),
     ]);
     
     if (mounted) {
@@ -112,10 +113,14 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(16)),
               ),
-              child: const Icon(
-                Icons.push_pin,
-                size: 40,
-                color: Colors.red,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Image.asset(
+                  'assets/images/pinterest-emblem.png',
+                  width: 56,
+                  height: 56,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(height: 24),
