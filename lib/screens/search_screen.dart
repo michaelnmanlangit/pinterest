@@ -63,7 +63,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
 
               // Search Results or Categories
-              if (provider.searchQuery.isEmpty) ...[
+              if (provider.searchQuery.isEmpty && provider.selectedCategory.isEmpty) ...[
                 // Categories when not searching
                 SliverToBoxAdapter(
                   child: Padding(
@@ -93,7 +93,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             final category = categories[index];
                             return GestureDetector(
                               onTap: () {
+                                _searchController.text = category;
                                 provider.filterByCategory(category);
+                                _searchFocusNode.unfocus();
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -131,7 +133,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Results for "${provider.searchQuery}"',
+                          provider.searchQuery.isNotEmpty 
+                            ? 'Results for "${provider.searchQuery}"'
+                            : 'Results for "${provider.selectedCategory}"',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

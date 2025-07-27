@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/pin.dart';
 import '../providers/pinterest_provider.dart';
@@ -58,7 +59,7 @@ class PinDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -290,37 +291,221 @@ class PinDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.download),
+              leading: const Icon(Icons.download, color: Colors.blue),
               title: const Text('Download image'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Download feature would be implemented here')),
-                );
+                _downloadImage(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.report),
+              leading: const Icon(Icons.report, color: Colors.orange),
               title: const Text('Report Pin'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Report feature would be implemented here')),
-                );
+                _reportPin(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.block),
+              leading: const Icon(Icons.visibility_off, color: Colors.red),
               title: const Text('Hide Pin'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Hide feature would be implemented here')),
-                );
+                _hidePin(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.copy, color: Colors.grey),
+              title: const Text('Copy link'),
+              onTap: () {
+                Navigator.pop(context);
+                _copyPinLink(context);
               },
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _downloadImage(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.download, color: Colors.blue),
+            SizedBox(width: 12),
+            Text('Downloading Image'),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Downloading image to your device...'),
+          ],
+        ),
+      ),
+    );
+
+    // Simulate download process
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!context.mounted) return;
+      Navigator.pop(context); // Close progress dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green),
+              SizedBox(width: 12),
+              Text('Download Complete'),
+            ],
+          ),
+          content: const Text('Image has been saved to your Downloads folder.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Opening Downloads folder...')),
+                );
+              },
+              child: const Text('Open Folder'),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  void _reportPin(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.report, color: Colors.orange),
+            SizedBox(width: 12),
+            Text('Report Pin'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Why are you reporting this Pin?'),
+            const SizedBox(height: 16),
+            ...[
+              'Spam or misleading content',
+              'Inappropriate or offensive content',
+              'Copyright infringement',
+              'Harmful or dangerous content',
+              'Other',
+            ].map((reason) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(reason),
+              leading: Radio<String>(
+                value: reason,
+                groupValue: null,
+                onChanged: (value) {
+                  Navigator.pop(context);
+                  _submitReport(context, reason);
+                },
+              ),
+            )),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submitReport(BuildContext context, String reason) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green),
+            SizedBox(width: 12),
+            Text('Report Submitted'),
+          ],
+        ),
+        content: Text('Thank you for reporting this Pin for "$reason". We\'ll review it and take appropriate action.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _hidePin(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.visibility_off, color: Colors.red),
+            SizedBox(width: 12),
+            Text('Hide Pin'),
+          ],
+        ),
+        content: const Text('Are you sure you want to hide this Pin? You won\'t see it in your feed anymore.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              final provider = Provider.of<PinterestProvider>(context, listen: false);
+              provider.hidePin(pin.id);
+              Navigator.pop(context); // Go back to previous screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Pin hidden from your feed'),
+                  action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                      provider.unhidePin(pin.id);
+                    },
+                  ),
+                ),
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Hide'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _copyPinLink(BuildContext context) {
+    final pinLink = 'https://pinterest.com/pin/${pin.id}';
+    Clipboard.setData(ClipboardData(text: pinLink));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Pin link copied to clipboard'),
+        duration: Duration(seconds: 2),
       ),
     );
   }

@@ -5,6 +5,10 @@ import '../providers/pinterest_provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/pin_card.dart';
 import '../utils/responsive_helper.dart';
+import 'account_settings_screen.dart';
+import 'notification_settings_screen.dart';
+import 'privacy_settings_screen.dart';
+import 'help_support_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -103,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ),
                         ),
                       ),
-                      if (currentUser?.bio != null && currentUser!.bio!.isNotEmpty) ...[
+                      if (currentUser?.bio != null && currentUser!.bio.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () {
@@ -112,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             );
                           },
                           child: Text(
-                            currentUser!.bio!,
+                            currentUser.bio,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[700],
@@ -199,10 +203,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                     controller: _tabController,
                     indicator: BoxDecoration(
                       color: Colors.black,
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(22),
                     ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicatorPadding: const EdgeInsets.all(3),
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.black,
+                    labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                    unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+                    dividerColor: Colors.transparent,
                     tabs: const [
                       Tab(text: 'Saved'),
                       Tab(text: 'Created'),
@@ -376,8 +385,9 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Account settings'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Account settings')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AccountSettingsScreen()),
                 );
               },
             ),
@@ -386,8 +396,9 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Notifications'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Notifications settings')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationSettingsScreen()),
                 );
               },
             ),
@@ -396,8 +407,9 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Privacy'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Privacy settings')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PrivacySettingsScreen()),
                 );
               },
             ),
@@ -406,8 +418,9 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: const Text('Help'),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Help center')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
                 );
               },
             ),

@@ -6,6 +6,8 @@ import '../widgets/pin_card.dart';
 import '../utils/responsive_helper.dart';
 import 'search_screen.dart';
 import 'profile_screen.dart';
+import 'notification_screen.dart';
+import 'message_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -148,16 +150,22 @@ class _PinterestHomeTabState extends State<PinterestHomeTab> {
                           IconButton(
                             icon: const Icon(Icons.notifications_outlined),
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Notifications')),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const NotificationScreen(),
+                                ),
                               );
                             },
                           ),
                           IconButton(
                             icon: const Icon(Icons.chat_bubble_outline),
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Messages')),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MessageScreen(),
+                                ),
                               );
                             },
                           ),

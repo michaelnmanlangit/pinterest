@@ -14,8 +14,9 @@ class DataService {
   List<Board> _boards = [];
   final List<String> _savedPins = [];
   final List<String> _likedPins = [];
+  final List<String> _hiddenPins = [];
 
-  List<Pin> get pins => List.unmodifiable(_pins);
+  List<Pin> get pins => List.unmodifiable(_pins.where((pin) => !_hiddenPins.contains(pin.id)).toList());
   List<User> get users => List.unmodifiable(_users);
   List<Board> get boards => List.unmodifiable(_boards);
   List<String> get savedPins => List.unmodifiable(_savedPins);
@@ -130,9 +131,24 @@ class DataService {
     return _pins
         .where((pin) => 
             pin.id != currentPin.id && 
+            !_hiddenPins.contains(pin.id) &&
             (pin.category == currentPin.category ||
              pin.tags.any((tag) => currentPin.tags.contains(tag))))
         .take(limit)
         .toList();
+  }
+
+  void hidePin(String pinId) {
+    if (!_hiddenPins.contains(pinId)) {
+      _hiddenPins.add(pinId);
+    }
+  }
+
+  void unhidePin(String pinId) {
+    _hiddenPins.remove(pinId);
+  }
+
+  List<Pin> getAllPins() {
+    return List.unmodifiable(_pins);
   }
 }

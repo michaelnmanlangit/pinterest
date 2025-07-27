@@ -15,8 +15,12 @@ class PinterestProvider extends ChangeNotifier {
   String _selectedCategory = '';
   bool _isLoading = false;
 
-  List<Pin> get pins => _filteredPins.isEmpty && _searchQuery.isEmpty && _selectedCategory.isEmpty 
-      ? _pins : _filteredPins;
+  List<Pin> get pins {
+    if (_searchQuery.isNotEmpty || _selectedCategory.isNotEmpty) {
+      return _filteredPins;
+    }
+    return _pins;
+  }
   List<User> get users => _users;
   List<Board> get boards => _boards;
   String get searchQuery => _searchQuery;
@@ -28,7 +32,7 @@ class PinterestProvider extends ChangeNotifier {
     notifyListeners();
     
     await _dataService.loadData();
-    _pins = _dataService.pins;
+    _pins = _dataService.getAllPins();
     _users = _dataService.users;
     _boards = _dataService.boards;
     
@@ -88,4 +92,24 @@ class PinterestProvider extends ChangeNotifier {
   Board? getBoardById(String id) => _dataService.getBoardById(id);
   
   List<Pin> getRelatedPins(Pin currentPin) => _dataService.getRelatedPins(currentPin);
+  
+  void hidePin(String pinId) {
+    _dataService.hidePin(pinId);
+    // Remove from current pins list to hide immediately
+    _pins.removeWhere((pin) => pin.id == pinId);
+    _filteredPins.removeWhere((pin) => pin.id == pinId);
+    notifyListeners();
+  }
+  
+  void unhidePin(String pinId) {
+    _dataService.unhidePin(pinId);
+    // Reload pins to show the unhidden pin
+    _pins = _dataService.getAllPins();
+    if (_searchQuery.isNotEmpty) {
+      searchPins(_searchQuery);
+    } else if (_selectedCategory.isNotEmpty) {
+      filterByCategory(_selectedCategory);
+    }
+    notifyListeners();
+  }
 }
